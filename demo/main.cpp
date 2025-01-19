@@ -8,8 +8,9 @@
 #include <polyscope/polyscope.h>
 #include <polyscope/curve_network.h>
 #include <polyscope/surface_mesh.h>
-#include "hmsh.h"
-#include "hgen.h"
+#include "hmesh/hmesh.h"
+#include "hmesh/properties.h"
+#include "hmesh/tree_cotree.h"
 
 
 using namespace pddg;
@@ -20,19 +21,33 @@ int main(int argc, char *argv[]) {
     MatXd V;
     MatXi F;
     igl::readOBJ(argv[1], V, F);
-    auto hmsh = std::make_unique<Hmsh>(V, F);
-    auto hgen = std::make_unique<Hgen>(*hmsh);
+    auto hmesh = std::make_unique<Hmesh>(V, F);
+    auto hgen = std::make_unique<Hgen>(*hmesh);
     hgen->calcHomologyGens(false);
 
     polyscope::init();
     polyscope::view::bgColor = std::array<float, 4>{0.02, 0.02, 0.02, 1};
     polyscope::options::groundPlaneMode = polyscope::GroundPlaneMode::ShadowOnly;
-    auto ps = polyscope::registerSurfaceMesh("mesh", hmsh->pos, hmsh->idx);
+    auto ps = polyscope::registerSurfaceMesh("mesh", hmesh->pos, hmesh->idx);
 
     /*--- visuailize curvature ---*/
 
+
+    ps->setSurfaceColor({0, 10./ 255., 27./ 255.});
+    VecXd GC(hmesh->nV);
+    VecXd MC(hmesh->nV);
+    MatXd PC(hmesh->nV, 2);
+    for (Vert v: hmesh->verts) {
+        GC[v.id] = scalarGaussianCurvature(v);
+        MC[v.id] = scalarMeanCurvature(v);
+        PC.row(v.id) = principalCurvature(v).transpose();
+    }
+    ps->addVertexScalarQuantity("Gaussian Curvature", GC);
+    ps->addVertexScalarQuantity("Mean Curvature", MC);
+    ps->addVertexScalarQuantity("Principal Curvature 1", PC.col(0));
+    ps->addVertexScalarQuantity("Principal Curvature 2", PC.col(1));
+
     { //--- another curvature definition by panozzo 2010 ---//
-        /*
         MatXd HN;
         SprsD L, M, Minv;
         igl::cotmatrix(V, F, L);
@@ -45,13 +60,11 @@ int main(int argc, char *argv[]) {
         VecXd H1 = HN.rowwise().norm();
         VecXd H2 = 0.5 * (PV1 + PV2);
         VecXd K = PV1.array() * PV2.array();
-         */
+        ps->addVertexScalarQuantity("Gaussian Curvature panozzo", K);
+    ps->addVertexScalarQuantity("Principal Curvature 1 panozzo", PV1);
+    ps->addVertexScalarQuantity("Principal Curvature 2 panozzo", PV2);
     }
-    ps->setSurfaceColor({0, 10./ 255., 27./ 255.});
-    ps->addVertexScalarQuantity("Gaussian Curvature", hmsh->angleDefect);
-    ps->addVertexScalarQuantity("Mean Curvature", hmsh->scalarMeanCurvature);
-    ps->addVertexScalarQuantity("Principal Curvature 1", hmsh->principalCurvatures.col(0));
-    ps->addVertexScalarQuantity("Principal Curvature 2", hmsh->principalCurvatures.col(1));
+
     ps->resetTransform();
     ps->setSmoothShade(true);
 
@@ -60,7 +73,7 @@ int main(int argc, char *argv[]) {
     /*--- visuailize vert basis ---*/
 
     /*--- visuailize boundary ---*/
-    for (Loop l: hmsh->loops) {
+    for (Loop l: hmesh->loops) {
         std::vector<glm::vec3> nodes;
         std::vector<double> value;
         std::vector<std::array<size_t, 2>> edges;
@@ -86,7 +99,7 @@ int main(int argc, char *argv[]) {
         std::vector<double> value;
         std::vector<std::array<size_t, 2>> edges;
         size_t n = 0;
-        for (Half h: hmsh->halfs) {
+        for (Half h: hmesh->halfs) {
             int val = hgen->generators[h.id];
             if (val > 0) {
                 Row3d p1 = h.face().center();

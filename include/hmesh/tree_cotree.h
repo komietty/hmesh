@@ -1,14 +1,13 @@
-#ifndef HMSH_HGEN_H
-#define HMSH_HGEN_H
-#include "hmsh.h"
+#ifndef HMESH_TREE_COTREE_H
+#define HMESH_TREE_COTREE_H
+#include "hmesh.h"
 
 /// Homology generator class with tree-cotree algorithm
-
 namespace pddg {
 class Hgen {
 public:
     std::vector<int> generators;
-    explicit Hgen(const Hmsh& mesh): mesh(mesh) {}
+    explicit Hgen(const Hmesh& mesh): mesh(mesh) {}
 
     void calcHomologyGens(bool includeBoundary = true) {
         auto shared = [](Face a, Face b) {
@@ -17,7 +16,7 @@ public:
         };
 
         auto isInner = [&](const Edge e) {
-            return !e.v0().isBoundary() && !e.v1().isBoundary();
+            return !e.vert0().isBoundary() && !e.vert1().isBoundary();
         };
 
         calcPrimalTree(mesh.verts[0]);
@@ -62,23 +61,23 @@ public:
     }
 
 private:
-    const Hmsh& mesh;
+    const Hmesh& mesh;
     std::vector<int> vp; // vert parent tree
     std::vector<int> fp; // face parent tree
 
-    bool isInPrimalTree(const Half h)  {
+    bool isInPrimalTree(const Half h) const {
         auto a = h.tail();
         auto b = h.head();
         return vp[a.id] == b.id || vp[b.id] == a.id;
     }
 
-    bool isInDualCotree(const Half h) {
+    bool isInDualCotree(const Half h) const {
         auto a = h.face();
         auto b = h.twin().face();
         return fp[a.id] == b.id || fp[b.id] == a.id;
     }
 
-    void calcPrimalTree(Vert bgn) {
+    void calcPrimalTree(const Vert bgn) {
         vp.resize(mesh.nV);
         for (auto v: mesh.verts) vp[v.id] = v.id;
         std::queue<Vert> que;
@@ -96,7 +95,7 @@ private:
         }
     }
 
-    void calcDualCotree(Face bgn) {
+    void calcDualCotree(const Face bgn) {
         fp.resize(mesh.nF);
         for(auto f: mesh.faces) fp[f.id] = f.id;
         std::queue<Face> que;

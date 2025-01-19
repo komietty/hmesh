@@ -1,5 +1,5 @@
-#ifndef HMSH_TYPEDEFS_H
-#define HMSH_TYPEDEFS_H
+#ifndef HMESH_TYPEDEFS_H
+#define HMESH_TYPEDEFS_H
 #include <Eigen/Sparse>
 
 namespace pddg {

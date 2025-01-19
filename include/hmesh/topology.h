@@ -4,8 +4,8 @@
 // 2024 Saki Komikado <komietty@gmail.com>,
 // This Source Code Form is subject to the terms of the Mozilla Public License v.2.0.
 
-#ifndef HMSH_TOPOLOGY_H
-#define HMSH_TOPOLOGY_H
+#ifndef HMESH_TOPOLOGY_H
+#define HMESH_TOPOLOGY_H
 #include "typedefs.h"
 
 namespace pddg {

@@ -1,4 +1,4 @@
-# hmsh -- Tiny halfedge structured mesh library
+# hmesh -- Tiny halfedge structured mesh library
 Hmsh is header only tiny library for generating halfedge structured mesh from basic triangle mesh. 
 This structure contains many basic properties needed for geometry processing, such as gradient, hodgestar, homology generator, and so on.
 

@@ -90,7 +90,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(libigl)
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/.. "hmsh")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/.. "hmesh")
 add_executable(${PROJECT_NAME} test.cpp)
-target_link_libraries(${PROJECT_NAME} gtest_main igl::core hmsh)
+target_link_libraries(${PROJECT_NAME} gtest_main igl::core hmesh)
 

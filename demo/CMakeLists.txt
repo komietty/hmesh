@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 project(hmshdemo)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 if(COMMAND cmake_policy)
     cmake_policy(SET CMP0003 NEW)
@@ -53,6 +53,6 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(libigl)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/polyscope/ "polyscope")
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../ "hmsh")
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/../ "hmesh")
 add_executable(${PROJECT_NAME} main.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE polyscope igl::core hmsh)
+target_link_libraries(${PROJECT_NAME} PRIVATE polyscope igl::core hmesh)

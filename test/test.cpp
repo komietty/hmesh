@@ -4,8 +4,8 @@
 #include <igl/barycenter.h>
 #include <igl/edge_topology.h>
 #include <igl/local_basis.h>
-#include "hmsh.h"
-#include "hgen.h"
+#include "hmesh/hmesh.h"
+#include "hmesh/tree_cotree.h"
 
 using namespace pddg;
 
@@ -22,7 +22,7 @@ TEST(hmsh, check_graph_structure) {
         MatXd V;
         MatXi F;
         igl::readOBJ(directory + path, V, F);
-        auto hmsh = std::make_unique<Hmsh>(V, F);
+        auto hmsh = std::make_unique<Hmesh>(V, F);
         //TODO: Better have some tests for homology group...
         auto hgen = std::make_unique<Hgen>(*hmsh);
         hgen->calcHomologyGens();
@@ -63,7 +63,7 @@ TEST(hmsh, check_properties) {
         MatXd V;
         MatXi F;
         igl::readOBJ(directory + path, V, F);
-        auto hmsh = std::make_unique<Hmsh>(V, F);
+        auto hmsh = std::make_unique<Hmesh>(V, F);
         MatXd baryCenter;
         VecXd faceArea;
         MatXd fbx, fby, fbz;
